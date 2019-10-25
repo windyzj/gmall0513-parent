@@ -13,10 +13,10 @@ import java.util.List;
 public class CanalApp {
 
     public static void main(String[] args) {
-        // 1 连接canal的服务端
+ // 1 连接canal的服务端
         CanalConnector canalConnector = CanalConnectors.newSingleConnector(new InetSocketAddress("hadoop1", 11111), "example", "", "");
 
-        // 2 抓取数据
+  // 2 抓取数据
         while (true){
             canalConnector.connect();
             canalConnector.subscribe("gmall0513.*");
@@ -31,7 +31,7 @@ public class CanalApp {
                     e.printStackTrace();
                 }
             }else {
-         // 3 抓取数据后，提取数据
+  // 3 抓取数据后，提取数据
                 //一个entry 代表一个sql执行的结果集
                 for (CanalEntry.Entry entry : message.getEntries()) {
                     //业务数据 StoreValue
@@ -47,6 +47,8 @@ public class CanalApp {
                         }
                         List<CanalEntry.RowData> rowDatasList = rowChange.getRowDatasList();
                         String tableName = entry.getHeader().getTableName();
+
+ // 4 处理业务数据  发送kafka 到对应的topic
                         CanalHandler canalHandler = new CanalHandler(rowChange.getEventType(), tableName, rowDatasList);
                         canalHandler.handle();
 
@@ -54,15 +56,8 @@ public class CanalApp {
 
                 }
 
-
-
             }
 
-
         }
-
-
-
-        // 4 处理业务数据  发送kafka 到对应的topic
     }
 }
