@@ -57,18 +57,20 @@ import collection.JavaConversions._
 
     //Batch   bulk
     def insertBulk( sourceList:List[(String,Any)],indexName:String,typeName:String): Unit ={
-      val jest: JestClient = getClient
-      val bulkBuilder = new Bulk.Builder()
-      bulkBuilder.defaultIndex(indexName).defaultType(typeName)
+      if(sourceList!=null&&sourceList.size>0){
+        val jest: JestClient = getClient
+        val bulkBuilder = new Bulk.Builder()
+        bulkBuilder.defaultIndex(indexName).defaultType(typeName)
 
-      for ( (id,source)<- sourceList ) {
-        val index: Index = new Index.Builder(source).id(id).build() //代表一次插入动作
-        bulkBuilder.addAction(index)
+        for ( (id,source)<- sourceList ) {
+          val index: Index = new Index.Builder(source).id(id).build() //代表一次插入动作
+          bulkBuilder.addAction(index)
+        }
+
+        val bulk: Bulk =bulkBuilder.build()
+        val items: util.List[BulkResult#BulkResultItem] = jest.execute(bulk).getItems
+        println(s" 保存= ${items.size()} 条数据!")
       }
-
-      val bulk: Bulk =bulkBuilder.build()
-      val items: util.List[BulkResult#BulkResultItem] = jest.execute(bulk).getItems
-      println(s" 保存= ${items.size()} 条数据!")
     }
 
 
